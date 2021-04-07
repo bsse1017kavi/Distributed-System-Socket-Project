@@ -1,9 +1,13 @@
 import socket
 import math
 import threading
+import random
 
 drivers = []
 riders = []
+
+db = open("db.txt", "w+")
+
 
 def min(a):
     min = a[0]
@@ -53,6 +57,12 @@ def scheduler():
         del riders[0]
         del drivers[index]
 
+        rating = random.randint(0,100)
+
+        db = open("db.txt", "a")
+
+        db.write("%d\n" %rating)
+
         #return req_rider, req_driver
 
 s = socket.socket()
@@ -61,6 +71,8 @@ s.bind(("localhost", 9999))
 
 s.listen(3)
 print('Waiting to be connected')
+
+db.write("")
 
 i = 0
 
