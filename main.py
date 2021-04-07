@@ -1,3 +1,4 @@
+#This is just for testing methods and has nothing to do with the project
 import threading
 
 def printit():
@@ -10,10 +11,11 @@ def two(a,b):
     sub = a-b
 
     return sum, sub
-# printit()
+print('Hii')
+printit()
 
-c = printit()
-
-print(c)
+# c = printit()
+#
+# print(c)
 
 

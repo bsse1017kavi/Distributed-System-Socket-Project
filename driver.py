@@ -3,7 +3,7 @@ import socket
 #from random import randint
 import random
 
-def connect_to_server():
+def connect_to_server(i):
     x = random.randint(-180, 180)
 
     y = random.randint(-180, 180)
@@ -11,7 +11,7 @@ def connect_to_server():
     # print(x)
     # print(y)
 
-    co = str(x) + "," + str(y) + ",driver";
+    co = str(x) + "," + str(y) + ",driver," + str(i);
 
     # for i in range(10):
     #     v = randint(-180,180)
@@ -30,4 +30,4 @@ def connect_to_server():
     print(c.recv(1024).decode())
 
 for i in range(10):
-    connect_to_server()
+    connect_to_server(i+1)

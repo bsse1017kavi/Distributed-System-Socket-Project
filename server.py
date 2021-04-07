@@ -6,8 +6,6 @@ import random
 drivers = []
 riders = []
 
-db = open("db.txt", "w+")
-
 
 def min(a):
     min = a[0]
@@ -54,14 +52,16 @@ def scheduler():
         print(riders[0])
         print(drivers[index])
 
-        del riders[0]
-        del drivers[index]
-
-        rating = random.randint(0,100)
+        rating = random.randint(0, 100)
 
         db = open("db.txt", "a")
 
-        db.write("%d\n" %rating)
+        string_to_write = str(drivers[index][2]) + "," + str(rating) +  "\n"
+
+        db.write(string_to_write)
+
+        del riders[0]
+        del drivers[index]
 
         #return req_rider, req_driver
 
@@ -72,7 +72,9 @@ s.bind(("localhost", 9999))
 s.listen(3)
 print('Waiting to be connected')
 
-db.write("")
+db = open("db.txt", "w+")
+
+db.write("Driver ID,Rating")
 
 i = 0
 
@@ -89,7 +91,7 @@ while True:
 
     co = c.recv(1024).decode()
 
-    x, y, mode = co.split(",")
+    x, y, mode, id = co.split(",")
 
     x = int(x)
     y = int(y)
@@ -102,6 +104,7 @@ while True:
         riders.append(co)
         #print('works')
     else:
+        co.append(id)
         drivers.append(co)
         # print('works b')
 
