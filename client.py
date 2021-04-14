@@ -12,6 +12,12 @@ def message(data):
     #print(1)
     print(data)
 
+    rating = random.randint(1,100)
+
+    data = {'rating': rating}
+
+    r = requests.post(url="http://localhost:8000/rating", data=data)
+
 
 def request_to_server():
     for i in range(10):

@@ -71,10 +71,11 @@ def minimal(a, b):
 
 @app.route('/rating', methods=['POST'])
 def rating():
-    # data = request.form
-    # id = int(data['id'])
+    data = request.form
+    rating = int(data['rating'])
+    print(rating)
 
-    rating = random.randint(1,100)
+    #rating = random.randint(1,100)
     #insert_to_table(id,rating)
 
     new_rating = Rating(rating=rating)
@@ -122,8 +123,8 @@ def driver():
     return ''
 
 
-@socketio.on('message')
-def communicate():
+def match_driver_rider():
+    messages = []
     if len(riders) > 0 and len(drivers) > 0:
         for i in range((len(riders))):
             index, fair = minimal(riders, drivers)
@@ -137,16 +138,25 @@ def communicate():
 
             #r = requests.post('http://localhost:8000/rating', data=rating_data)
 
-            rating()
+            #rating()
 
             del riders[0]
             del drivers[index]
 
-            socketio.emit('message', message, namespace='/communication')
-
+            messages.append(message)
 
     else:
-        socketio.emit('message', 'Not enough rider or driver yet', namespace='/communication')
+        message = 'Not enough rider or driver yet'
+        messages.append(message)
+
+    return messages
+
+@socketio.on('message')
+def communicate():
+    messages = match_driver_rider()
+
+    for message in messages:
+        socketio.emit('message', message, namespace='/communication')
 
     #socketio.emit('message', 'Not enough rider or driver yet', namespace='/communication')
 
