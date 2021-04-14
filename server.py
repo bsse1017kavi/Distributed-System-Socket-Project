@@ -1,7 +1,8 @@
 from flask import Flask,request
 from flask_socketio import SocketIO
 from flask_apscheduler import APScheduler
-import math
+import math, random, sqlite3, requests
+from flask_sqlalchemy import SQLAlchemy
 
 riders = []
 drivers = []
@@ -10,6 +11,30 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret'
 socketio = SocketIO(app)
 scheduler = APScheduler()
+
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ratings.db'
+db = SQLAlchemy(app)
+
+class Rating(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    rating = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        return '<Rating %r>' % self.id
+
+def insert_to_table(id, rating):
+
+    conn = sqlite3.connect('./ratings.db')
+    cursor = conn.cursor()
+
+    cursor.execute('''CREATE TABLE ratings (id TEXT  NOT NULL, rating TEXT NOT NULL); ''')
+    cursor.execute('''INSERT INTO ratings(id, rating) VALUES (?, ?)''', (str(id),str(rating)))
+
+    conn.commit()
+    print("Record inserted")
+    cursor.execute('select * from ratings')
+
+    conn.close()
 
 def min(a):
     min = a[0]
@@ -40,7 +65,23 @@ def minimal(a, b):
 
     index = min(distances)
 
-    return index
+    fair = int(distances[index] * 10)
+
+    return index, fair
+
+@app.route('/rating', methods=['POST'])
+def rating():
+    # data = request.form
+    # id = int(data['id'])
+
+    rating = random.randint(1,100)
+    #insert_to_table(id,rating)
+
+    new_rating = Rating(rating=rating)
+    db.session.add(new_rating)
+    db.session.commit()
+
+    return ''
 
 @app.route('/rider', methods=['POST','GET'])
 def rider():
@@ -84,19 +125,25 @@ def driver():
 @socketio.on('message')
 def communicate():
     if len(riders) > 0 and len(drivers) > 0:
-        index = minimal(riders, drivers)
+        for i in range((len(riders))):
+            index, fair = minimal(riders, drivers)
+            req_rider = riders[0]
+            req_driver = drivers[index]
 
-        req_rider = riders[0]
-        req_driver = drivers[index]
+            message = "Rider location " + "(" + str(req_rider[0]) + "," + str(
+                req_rider[1]) + ")" + " was matched with Driver location" + "(" + str(req_driver[0]) + "," + str(
+                req_driver[1]) + ")" + " Fair: " + str(fair) + " Taka"
 
-        message = "Rider location " + "(" + str(req_rider[0]) + "," + str(
-            req_rider[1]) + ")" + " was matched with Driver location" + "(" + str(req_driver[0]) + "," + str(
-            req_driver[1]) + ")"
 
-        del riders[0]
-        del drivers[index]
+            #r = requests.post('http://localhost:8000/rating', data=rating_data)
 
-        socketio.emit('message', message, namespace='/communication')
+            rating()
+
+            del riders[0]
+            del drivers[index]
+
+            socketio.emit('message', message, namespace='/communication')
+
 
     else:
         socketio.emit('message', 'Not enough rider or driver yet', namespace='/communication')
