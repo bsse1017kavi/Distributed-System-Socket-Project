@@ -16,7 +16,7 @@ def message(data):
 
     data = {'rating': rating}
 
-    r = requests.post(url="http://localhost:7000/rating", data=data)
+    r = requests.post(url="http://localhost:8002/rating", data=data)
 
 
 def request_to_server():
@@ -31,7 +31,7 @@ def request_to_server():
                 'y': y,
             }
 
-        r = requests.post(url="http://localhost:8000/rider", data=data)
+        r = requests.post(url="http://localhost:8002/rider", data=data)
 
         # Driver Client
         x = random.randint(-180, 180)
@@ -43,7 +43,7 @@ def request_to_server():
                 'y': y,
             }
 
-        r = requests.post(url="http://localhost:8000/driver", data=data)
+        r = requests.post(url="http://localhost:8002/driver", data=data)
 
 scheduler.add_job(id='New Task', func=request_to_server, trigger='interval', seconds=5)
 scheduler.start()
