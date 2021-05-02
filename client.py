@@ -47,3 +47,6 @@ def request_to_server():
 
 scheduler.add_job(id='New Task', func=request_to_server, trigger='interval', seconds=5)
 scheduler.start()
+
+# while True:
+#     request_to_server()

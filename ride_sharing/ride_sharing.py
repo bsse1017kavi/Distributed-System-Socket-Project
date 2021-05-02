@@ -1,11 +1,13 @@
 from flask import Flask, request
 import math, requests
 from flask_apscheduler import APScheduler
+from apscheduler.schedulers.background import BackgroundScheduler
 
 drivers = []
 riders = []
 
-scheduler = APScheduler()
+#scheduler = APScheduler()
+scheduler = BackgroundScheduler({'apscheduler.job_defaults.max_instances': '2'})
 
 app = Flask(__name__)
 
@@ -42,7 +44,7 @@ def minimal(a, b):
 
     return index, fair
 
-@app.route('/rider', methods=['POST','GET'])
+@app.route('/rider', methods=['POST'])
 def rider():
     data = request.form
 
@@ -56,9 +58,9 @@ def rider():
 
     riders.append(co)
 
-    return ''
+    return {"x":1}
 
-@app.route('/driver', methods=['POST','GET'])
+@app.route('/driver', methods=['POST'])
 def driver():
     data = request.form
 
@@ -72,9 +74,11 @@ def driver():
 
     drivers.append(co)
 
-    return ''
+    return {"x":1}
 
 def match_driver_rider():
+    print(drivers)
+    print(riders)
     #messages = []
     if len(riders) > 0 and len(drivers) > 0:
         for i in range((len(riders))):
@@ -90,7 +94,7 @@ def match_driver_rider():
 
             data = {'message': message}
 
-            r = requests.post('http://localhost:9000/message', data=data)
+            r = requests.post('http://172.17.0.1:9000/message', data=data)
 
             del riders[0]
             del drivers[index]
@@ -106,4 +110,4 @@ def match_driver_rider():
 if __name__ == "__main__":
     scheduler.add_job(id='Schedule Task', func=match_driver_rider, trigger='interval', seconds=5)
     scheduler.start()
-    app.run(debug=True, host="localhost", port=8000)
+    app.run(debug=True, host="0.0.0.0", port=8000)

@@ -27,9 +27,10 @@ def communicate():
         del messages[:]
 
     else:
-        socketio.emit('message', 'Not enough rider or driver yet', namespace='/communication')
+        # socketio.emit('message', 'Not enough rider or driver yet', namespace='/communication')
+        socketio.emit('message', 'Not enough rider or driver yet from communication', namespace='/communication')
 
 if __name__ == "__main__":
     scheduler.add_job(id='Schedule Task', func=communicate, trigger='interval', seconds=5)
     scheduler.start()
-    socketio.run(app, port=9000)
+    socketio.run(app, host="0.0.0.0", port=9000)

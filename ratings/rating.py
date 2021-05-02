@@ -2,7 +2,7 @@ from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///ratings.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://kavi:iit123@localhost/ds'
 db = SQLAlchemy(app)
 
 class Rating(db.Model):
