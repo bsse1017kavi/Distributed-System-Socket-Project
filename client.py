@@ -4,7 +4,7 @@ from flask_apscheduler import APScheduler
 scheduler = APScheduler()
 
 c = socketio.Client()
-c.connect("http://localhost:9000", namespaces=['/communication'])
+c.connect("http://127.0.0.1:9000", namespaces=['/communication'])
 
 #function name should be same as event of server
 @c.event(namespace='/communication')
@@ -16,7 +16,7 @@ def message(data):
 
     data = {'rating': rating}
 
-    r = requests.post(url="http://localhost:8002/rating", data=data)
+    r = requests.post(url="http://127.0.0.1:8005/rating", data=data)
 
 
 def request_to_server():
@@ -31,7 +31,7 @@ def request_to_server():
                 'y': y,
             }
 
-        r = requests.post(url="http://localhost:8002/rider", data=data)
+        r = requests.post(url="http://127.0.0.1:8005/rider", data=data)
 
         # Driver Client
         x = random.randint(-180, 180)
@@ -43,7 +43,7 @@ def request_to_server():
                 'y': y,
             }
 
-        r = requests.post(url="http://localhost:8002/driver", data=data)
+        r = requests.post(url="http://127.0.0.1:8005/driver", data=data)
 
 scheduler.add_job(id='New Task', func=request_to_server, trigger='interval', seconds=5)
 scheduler.start()

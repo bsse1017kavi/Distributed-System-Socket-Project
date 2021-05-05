@@ -94,7 +94,7 @@ def match_driver_rider():
 
             data = {'message': message}
 
-            r = requests.post('http://172.17.0.1:9000/message', data=data)
+            r = requests.post('http://communication:9000/message', data=data)
 
             del riders[0]
             del drivers[index]
