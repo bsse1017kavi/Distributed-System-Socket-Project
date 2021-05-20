@@ -26,4 +26,5 @@ ADD . /ratings
 
 EXPOSE 7000
 
+CMD ["python", "/ratings/init_db.py"]
 CMD ["python", "/ratings/rating.py"]

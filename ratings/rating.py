@@ -2,8 +2,11 @@ from flask import Flask, request
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://kavi:iit123@localhost/ds'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://kavi:iit123@database:3306/ds'
+app.config['SQLALCHEMY_TRACK_MODIFICATION'] = False
 db = SQLAlchemy(app)
+print('Hello')
+print(db)
 
 class Rating(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -25,7 +28,8 @@ def rating():
     db.session.add(new_rating)
     db.session.commit()
 
-    return ''
+    return str(db.session)
 
 if __name__ == "__main__":
-    app.run(debug=True, host="localhost", port=7000)
+    #db.create_all()
+    app.run(debug=True, host="0.0.0.0", port=7000)

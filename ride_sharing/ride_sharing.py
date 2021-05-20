@@ -1,3 +1,4 @@
+import flask
 from flask import Flask, request
 import math, requests
 from flask_apscheduler import APScheduler
@@ -6,8 +7,8 @@ from apscheduler.schedulers.background import BackgroundScheduler
 drivers = []
 riders = []
 
-#scheduler = APScheduler()
-scheduler = BackgroundScheduler({'apscheduler.job_defaults.max_instances': '2'})
+scheduler = APScheduler()
+#scheduler = BackgroundScheduler({'apscheduler.job_defaults.max_instances': '2'})
 
 app = Flask(__name__)
 
@@ -47,18 +48,18 @@ def minimal(a, b):
 @app.route('/rider', methods=['POST'])
 def rider():
     data = request.form
-
-    message = str(data['x']) + ',' + str(data['y'])
-
-    print(message)
-
+    #
+    #message = str(data['x']) + ',' + str(data['y'])
+    #
+    # print(message)
+    #
     co = []
     co.append(data['x'])
     co.append(data['y'])
-
+    #
     riders.append(co)
 
-    return {"x":1}
+    return flask.Response(status=201)
 
 @app.route('/driver', methods=['POST'])
 def driver():
@@ -90,11 +91,12 @@ def match_driver_rider():
                 req_rider[1]) + ")" + " was matched with Driver location" + "(" + str(req_driver[0]) + "," + str(
                 req_driver[1]) + ")" + " Fair: " + str(fair) + " Taka"
 
-            #print(message)
+            print(message)
 
             data = {'message': message}
 
             r = requests.post('http://communication:9000/message', data=data)
+            #r = requests.post('http://0.0.0.0:9000/message', data=data)
 
             del riders[0]
             del drivers[index]

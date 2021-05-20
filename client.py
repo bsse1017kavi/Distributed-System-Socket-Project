@@ -1,7 +1,9 @@
+import time
+
 import requests, socketio, random
 from flask_apscheduler import APScheduler
 
-scheduler = APScheduler()
+#scheduler = APScheduler()
 
 c = socketio.Client()
 c.connect("http://127.0.0.1:9000", namespaces=['/communication'])
@@ -17,10 +19,12 @@ def message(data):
     data = {'rating': rating}
 
     r = requests.post(url="http://127.0.0.1:8005/rating", data=data)
+    #r = requests.post(url="http://127.0.0.1:8002/rating", data=data)
 
 
 def request_to_server():
     for i in range(10):
+        # print("hello")
         # Rider Client
         x = random.randint(-180, 180)
         y = random.randint(-180, 180)
@@ -30,8 +34,10 @@ def request_to_server():
                 'x': x,
                 'y': y,
             }
+        #print(data)
 
         r = requests.post(url="http://127.0.0.1:8005/rider", data=data)
+        #r = requests.post(url="http://127.0.0.1:8002/rider", data=data)
 
         # Driver Client
         x = random.randint(-180, 180)
@@ -43,10 +49,16 @@ def request_to_server():
                 'y': y,
             }
 
+        #print(data)
+    #
         r = requests.post(url="http://127.0.0.1:8005/driver", data=data)
+        #r = requests.post(url="http://127.0.0.1:8002/driver", data=data)
 
-scheduler.add_job(id='New Task', func=request_to_server, trigger='interval', seconds=5)
-scheduler.start()
+# scheduler.add_job(id='New Task', func=request_to_server, trigger='interval', seconds=5)
+# scheduler.start()
 
-# while True:
-#     request_to_server()
+while True:
+    request_to_server()
+    time.sleep(4)
+    # print("Hello")
+    # time.sleep(4)
