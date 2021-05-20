@@ -1,0 +1,15 @@
+For docker compose:
+sudo docker-compose build
+sudo docker-compose up
+
+For individual containers:
+sudo docker build -t ds-ride_sharing-v1:latest .
+sudo docker run --rm -p 8000:8000 ds-ride_sharing-v1
+
+sudo docker build -t ds-communication-v1:latest .
+sudo docker run --rm -p 9000:9000 ds-communication-v1
+
+sudo docker build -t ds-rating-v1:latest .
+sudo docker run --rm -p 7000:7000 ds-rating-v1
+
+run client

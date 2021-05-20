@@ -1,0 +1,110 @@
+version: '3'
+
+networks:
+  tenda:
+    ipam:
+      config:
+        - subnet:
+            15.20.0.0/24
+
+
+services:
+  database:
+    container_name: mysql-rating
+    image: mysql
+    command: mysqld --default-authentication-plugin=mysql_native_password
+    ports:
+    - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=ds
+      - MYSQL_USER=kavi
+      - MYSQL_ROOT_PASSWORD=iit123
+      - MYSQL_PASSWORD=iit123
+    networks:
+      tenda:
+        #ipv4_address: 15.20.0.100
+    volumes:
+      - ./database/dbdt:/var/lib/mysql
+      - ./database/initdb:/docker-entrypoint-initdb.d/:ro
+  rating:
+    container_name: ds-rating-v1
+    build: ./ratings
+    restart: always
+    depends_on:
+      - database
+    networks:
+      tenda:
+        #-
+  communication-dhaka:
+    container_name: ds-communication-dhaka
+    build: ./communication
+    restart: always
+    expose:
+      - 9000
+    environment:
+      - SERVERLOCATION=dhaka
+    networks:
+      tenda:
+         ipv4_address: 15.20.0.3
+
+  communication-chittagong:
+    container_name: ds-communication-chittagong
+    build: ./communication
+    restart: always
+    expose:
+      - 9000
+    environment:
+      - SERVERLOCATION=chittagong
+    networks:
+      tenda:
+         ipv4_address: 15.20.0.4
+
+  ride-sharing-dhaka:
+    container_name: ds-ride_sharing-dhaka
+    build: ./ride_sharing
+    depends_on:
+      - communication-dhaka
+    environment:
+      - SERVERLOCATION=dhaka
+    networks:
+      tenda:
+         #ipv4_address: 15.20.0.1
+
+  ride-sharing-chittagong:
+    container_name: ds-ride_sharing-chittagong
+    build: ./ride_sharing
+    depends_on:
+      - communication-chittagong
+    environment:
+      - SERVERLOCATION=chittagong
+    networks:
+      tenda:
+         #ipv4_address: 15.20.0.2
+
+  nginx-dhaka:
+    container_name: nginx-dhaka
+    build: ./nginx
+    restart: always
+    depends_on:
+      - ride-sharing-dhaka
+      - rating
+    environment:
+      - API_V1=ride-sharing-dhaka
+    command: /bin/sh -c "envsubst < /etc/nginx/conf.d/nginx.conf.template > /etc/nginx/conf.d/nginx.conf && nginx -g 'daemon off;'"
+    networks:
+      tenda:
+        ipv4_address: 15.20.0.10
+
+  nginx-chittagong:
+    container_name: nginx-chittagong
+    build: ./nginx
+    restart: always
+    depends_on:
+      - ride-sharing-chittagong
+      - rating
+    environment:
+      - API_V1=ride-sharing-chittagong
+    command: /bin/sh -c "envsubst < /etc/nginx/conf.d/nginx.conf.template > /etc/nginx/conf.d/nginx.conf && nginx -g 'daemon off;'"
+    networks:
+      tenda:
+        ipv4_address: 15.20.0.11

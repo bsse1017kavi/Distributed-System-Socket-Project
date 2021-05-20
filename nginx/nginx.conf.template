@@ -1,0 +1,18 @@
+server{
+    listen 8005;
+
+    location /driver
+    {
+        proxy_pass http://${API_V1}:8000;
+    }
+
+    location /rider
+    {
+        proxy_pass http://${API_V1}:8000;
+    }
+
+    location /rating
+    {
+        proxy_pass http://rating:7000;
+    }
+}
